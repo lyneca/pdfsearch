@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>PDF Search Tool</title>
+    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <main>
+      <h1>PDF Search</h1>
+      <header>
+        <input type="text" name="search" id="search" placeholder="Enter a search term...">
+        <button id="directory">
+          <img src="search-folder.svg" />
+        </button>
+      </header>
+      <div id="loading">Loading...</div>
+      <section id="results"></section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

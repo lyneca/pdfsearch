@@ -1,0 +1,117 @@
+body, html {
+    background-color: #333333;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+main {
+    text-align: center;
+    position: relative;
+    font-family: "Fira Code", "Inconsolata", monospace;
+    color: #cccccc;
+}
+
+header {
+    border-bottom: 1px solid #555555;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 1fr 30px;
+    padding: 0 100px 20px 100px;
+    display: flex;
+    justify-content: center;
+}
+
+h1 {
+    font-weight: normal;
+}
+
+input#search {
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #555555;
+    color: #cccccc;
+    outline: none !important;
+    font-size: 25px;
+    font: inherit;
+    margin: 0 10px;
+    width: 70%;
+}
+
+#directory > img {
+    max-width: 30px;
+}
+
+#directory {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 5px;
+    background-color: #555555;
+    color: #cccccc;
+    outline: none !important;
+    font-size: 25px;
+    font: inherit;
+}
+
+section#results {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+div.result {
+    width: 300px;
+    margin: 10px;
+    padding: 5px;
+    border: 1px solid #555555;
+    border-radius: 5px;
+    text-align: left;
+}
+
+div.result-filename {
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #555555;
+    overflow-x: scroll;
+}
+
+div.result-content {
+    display: grid;
+    word-wrap: break-word;
+    grid-template-columns: 1fr 6fr;
+}
+
+div.result-line {
+    padding-right: 5px;
+    margin-right: 5px;
+    border-right: 1px solid #555555;
+    color: #aaaaaa;
+    text-align: right;
+    min-width: 25px;
+    font-size: 10px;
+}
+
+div.result-text {
+    overflow: auto;
+}
+
+div.result-line:after {
+    content: ".";
+}
+
+span.highlight {
+    color: #55CC55;
+}
+
+div#loading {
+    display: none;
+    position: absolute;
+    top: 140px;
+    left: 50%;
+    width: 100px;
+    margin-left: -50px;
+}
