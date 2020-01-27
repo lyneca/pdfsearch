@@ -14,8 +14,12 @@ function renderResult(query, path, lines) {
     const regex = new RegExp(query, "i");
     if (lines === undefined) return '';
 
+    if (os.platform() == 'win32') {
+        path = path.replace(/^\/mnt\/([a-z])/, '$1:').replace(/\//g, '\\\\')
+    }
+
     return `<div class="result">
-        <div class="result-filename" onclick="shell.openItem('${path.replace(/^\/mnt\/([a-z])/, '$1:').replace(/\//g, '\\\\')}')">${filename}</div>
+        <div class="result-filename" onclick="shell.openItem('${path}')">${filename}</div>
         <div class="result-content">
             ${lines.map(l => {
         const [_, line, content] = l.split(':', 3);
