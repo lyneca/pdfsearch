@@ -70,9 +70,12 @@ div.result {
     border: 1px solid #555555;
     border-radius: 5px;
     text-align: left;
+    user-select: none;
 }
 
 div.result-filename {
+    cursor: pointer;
+    color: white;
     padding-bottom: 5px;
     margin-bottom: 5px;
     border-bottom: 1px solid #555555;
@@ -97,6 +100,7 @@ div.result-line {
 
 div.result-text {
     overflow: auto;
+    user-select: text;
 }
 
 div.result-line:after {
@@ -105,10 +109,12 @@ div.result-line:after {
 
 span.highlight {
     color: #55CC55;
+    background-color: #334433;
 }
 
 div#loading {
-    display: none;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
     position: absolute;
     top: 140px;
     left: 50%;

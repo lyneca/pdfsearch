@@ -4,18 +4,16 @@ const searchBox = document.getElementById('search');
 const directoryButton = document.getElementById('directory');
 const loading = document.getElementById('loading');
 const results = document.getElementById('results');
-const app = require('electron').remote.app;
-let dialog = require('electron').remote.dialog;
+const {app, dialog, shell} = require('electron').remote;
+const os = require('os');
 let directory = app.getPath('downloads');
 
 function renderResult(query, path, lines) {
     const filename = basename(path);
     const regex = new RegExp(query, "i");
 
-    console.log(lines)
-
     return `<div class="result">
-        <div class="result-filename">${filename}</div>
+        <div class="result-filename" onclick="shell.openItem('${path}')">${filename}</div>
         <div class="result-content">
             ${lines.map(l => {
                 const [_, line, content] = l.split(':', 3);
@@ -27,10 +25,18 @@ function renderResult(query, path, lines) {
     </div>`
 }
 
+function spawnProcess() {
+    if (os.platform() == "win32") {
+        return spawn("bash", ["-c", `pdfgrep "${query}" -Pinr "${directory}"`]);
+    } else {
+        return spawn("pdfgrep", [query, "-Pinr", directory]);
+    }
+}
+
 function search(query) {
-    console.log(directory)
-    const process = spawn("pdfgrep", [query, "-inr", directory]);
-    loading.style.display = "block";
+    const process = 
+    results.innerHTML = "";
+    loading.style.opacity = "1";
     let output = "";
     process.stdout.on("data", data => {
         output += data.toString()
@@ -41,13 +47,12 @@ function search(query) {
             .map(item => item.split(':')[0])
             .filter(a => a !== "")
             .filter((item, i, ar) => ar.indexOf(item) === i)
-        console.log(uniqueList);
-        loading.style.display = "none";
+        loading.style.opacity = "0";
         results.innerHTML = uniqueList.map(filename => renderResult(
             query,
             filename,
             outputList.filter(item => item.split(':')[0] === filename)
-                .slice(0, 10)
+                .slice(0, 20)
         )).join('');
     });
 }
@@ -56,19 +61,21 @@ function clear() {
     results.innerHTML = "";
 }
 
-searchBox.oninput = () => {
+function doSearch() {
     const query = searchBox.value;
     if (query === "") clear();
     else search(query);
 }
 
+searchBox.oninput = doSearch;
+
 directoryButton.onclick = () => {
     dialog.showOpenDialog({ 'properties': ['openDirectory'] })
         .then(dir => {
-            console.log(dir);
             if (dir !== undefined && dir.filePaths.length > 0) {
                 directory = dir.filePaths[0]
                 searchBox.setAttribute('placeholder', `Search in ${basename(directory)}...`)
+                doSearch();
             }
         });
 }
