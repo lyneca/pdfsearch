@@ -25,16 +25,17 @@ function renderResult(query, path, lines) {
     </div>`
 }
 
-function spawnProcess() {
+function spawnProcess(query) {
     if (os.platform() == "win32") {
-        return spawn("bash", ["-c", `pdfgrep "${query}" -Pinr "${directory}"`]);
+        return spawn("bash", ["-c", `pdfgrep "${query}" -Pinr "${directory}" -m 20`]);
     } else {
-        return spawn("pdfgrep", [query, "-Pinr", directory]);
+        return spawn("pdfgrep", [query, "-Pinr", directory, "-m", "20"]);
     }
 }
 
 function search(query) {
-    const process = 
+    const process = spawnProcess(query);
+    console.log(process)
     results.innerHTML = "";
     loading.style.opacity = "1";
     let output = "";
@@ -52,7 +53,6 @@ function search(query) {
             query,
             filename,
             outputList.filter(item => item.split(':')[0] === filename)
-                .slice(0, 20)
         )).join('');
     });
 }
@@ -70,14 +70,22 @@ function doSearch() {
 searchBox.oninput = doSearch;
 
 directoryButton.onclick = () => {
-    dialog.showOpenDialog({ 'properties': ['openDirectory'] })
-        .then(dir => {
-            if (dir !== undefined && dir.filePaths.length > 0) {
-                directory = dir.filePaths[0]
-                searchBox.setAttribute('placeholder', `Search in ${basename(directory)}...`)
-                doSearch();
-            }
-        });
+    const dirs = dialog.showOpenDialog({ 'properties': ['openDirectory'] });
+    if (dirs !== undefined && dirs.length > 0) {
+        directory = dirs[0];
+        searchBox.setAttribute('placeholder', `Search in ${basename(directory)}...`)
+        doSearch();
+    }
+
+    // dialog.showOpenDialog({ 'properties': ['openDirectory'] })
+        // .then(dir => {
+            // if (dir !== undefined && dir.filePaths.length > 0) {
+                // console.log(dir)
+                // directory = dir.filePaths[0]
+                // searchBox.setAttribute('placeholder', `Search in ${basename(directory)}...`)
+                // doSearch();
+            // }
+        // });
 }
 
 searchBox.setAttribute('placeholder', `Search in ${basename(directory)}...`)
