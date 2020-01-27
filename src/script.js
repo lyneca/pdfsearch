@@ -4,37 +4,48 @@ const searchBox = document.getElementById('search');
 const directoryButton = document.getElementById('directory');
 const loading = document.getElementById('loading');
 const results = document.getElementById('results');
-const {app, dialog, shell} = require('electron').remote;
+const { app, dialog, shell } = require('electron').remote;
 const os = require('os');
 let directory = app.getPath('downloads');
+let process;
 
 function renderResult(query, path, lines) {
     const filename = basename(path);
     const regex = new RegExp(query, "i");
+    if (lines === undefined) return '';
 
     return `<div class="result">
-        <div class="result-filename" onclick="shell.openItem('${path}')">${filename}</div>
+        <div class="result-filename" onclick="shell.openItem('${path.replace(/^\/mnt\/([a-z])/, '$1:').replace(/\//g, '\\\\')}')">${filename}</div>
         <div class="result-content">
             ${lines.map(l => {
-                const [_, line, content] = l.split(':', 3);
-                const highlightContent = content.replace(regex, '<span class="highlight">$&</span>');
-                return `<div class="result-line">${line}</div>
+        const [_, line, content] = l.split(':', 3);
+        if (content === undefined) return ''
+        const highlightContent = content.replace(regex, '<span class="highlight">$&</span>');
+        return `<div class="result-line">${line}</div>
                         <div class="result-text">${highlightContent}</div>`
-            }).join('')}
+    }).join('')}
         </div>
     </div>`
 }
 
 function spawnProcess(query) {
     if (os.platform() == "win32") {
-        return spawn("bash", ["-c", `pdfgrep "${query}" -Pinr "${directory}" -m 20`]);
+        const stoopidWindowsDir = directory.replace(/^([A-Z]):\\/, (_, m) => `/mnt/${m.toLowerCase()}/`).replace(/\\/g, '/');
+        console.log(directory, stoopidWindowsDir);
+        return spawn("bash", ["-c", `pdfgrep "${query}" -Pinr "${stoopidWindowsDir}" -m 20`]);
     } else {
         return spawn("pdfgrep", [query, "-Pinr", directory, "-m", "20"]);
     }
 }
 
 function search(query) {
-    const process = spawnProcess(query);
+    if (process) {
+        process.stdout.removeAllListeners();
+        process.removeAllListeners();
+        process.kill();
+        loading.style.opacity = "1";
+    }
+    process = spawnProcess(query);
     console.log(process)
     results.innerHTML = "";
     loading.style.opacity = "1";
@@ -78,14 +89,14 @@ directoryButton.onclick = () => {
     }
 
     // dialog.showOpenDialog({ 'properties': ['openDirectory'] })
-        // .then(dir => {
-            // if (dir !== undefined && dir.filePaths.length > 0) {
-                // console.log(dir)
-                // directory = dir.filePaths[0]
-                // searchBox.setAttribute('placeholder', `Search in ${basename(directory)}...`)
-                // doSearch();
-            // }
-        // });
+    // .then(dir => {
+    // if (dir !== undefined && dir.filePaths.length > 0) {
+    // console.log(dir)
+    // directory = dir.filePaths[0]
+    // searchBox.setAttribute('placeholder', `Search in ${basename(directory)}...`)
+    // doSearch();
+    // }
+    // });
 }
 
 searchBox.setAttribute('placeholder', `Search in ${basename(directory)}...`)
